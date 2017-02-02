@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Index</title>
+</head>
+<body>
+	<h1>Bienvenido {{ .UserName }} </h1>
+	
+	{{if .TienePermiso "si"}}
+	  <p>Verdadero</p>
+	{{else}}
+	  <p>Falso</p>
+	{{end}}
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Index</title>
+</head>
+<body>
+	
+	<p>Tags</p>
+	<ul>
+		{{ range .Tags }}
+			<li> {{ . }} </li>
+		{{ end }}
+	</ul>
+
+	<p>Cursos</p>
+	<ul>
+		{{ range .Courses }}
+			<li> {{ .Name }} </li>
+		{{ end }}
+	</ul>
+
+</body>
+</html>

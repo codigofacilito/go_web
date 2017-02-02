@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Index</title>
+</head>
+<body>
+	<h2>Bienvenio {{ .UserName }}</h2>
+	
+	{{with $valor := "Nuevo valor" }}	
+		<p> {{ $valor }}</p>
+	{{ end }}
+
+	{{with $activo := true }}	
+		{{ if $activo }}
+			<p>El valor es verdadero.</p>
+		{{ end }}
+	{{ end }}
+
+	{{with $nuevo := .Edad }}	
+		<p>{{ $nuevo }}</p>
+	{{ end }}
+
+</body>
+</html>

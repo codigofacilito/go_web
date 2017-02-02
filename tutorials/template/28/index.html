@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Index</title>
+</head>
+<body>
+	<h1>Bienvenido {{ .UserName }} </h1>
+	
+	{{if (and .Activate .Admin ) }}
+		<p> Super Administrador. </p>
+	{{end}}
+	
+	{{ if .Activate }}
+		<p>La bandera es verdadera.</p>
+	{{ else }}
+		<p>La bandera es falsa.</p>
+	{{ end }}	
+	
+	{{ if (ge .Edad 18)}}
+		<p>Mayor de edad</p>
+	{{ end }}
+	
+</body>
+</html>
