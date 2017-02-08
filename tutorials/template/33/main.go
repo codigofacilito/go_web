@@ -6,9 +6,23 @@ import(
     "log"
 )
 
+func hello() string{
+    return "Hola Mundo";
+}
+
+func suma(v1, v2 int) int{
+    return v1 + v2;
+}
+
 func main(){
     http.HandleFunc("/", func(w http.ResponseWriter, r * http.Request){
-        template, err := template.ParseFiles("index.html")
+        
+        funcs := template.FuncMap{
+            "hola": hello,
+            "suma": suma,
+        }
+
+        template, err := template.New("index.html").Funcs(funcs).ParseFiles("index.html", "footer.html", "header.html")
         if err != nil{
             panic(err)
         }

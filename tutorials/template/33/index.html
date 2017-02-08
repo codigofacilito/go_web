@@ -1,3 +1,7 @@
+{{ define "header"}}
+	<h1>Hola Mundo.</h1>
+{{ end }}
+
 {{ define "footer"}}
 	<footer>
 		<p>Este es el pie de página.</p>
@@ -7,10 +11,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>Index</title>
 </head>
 <body>
-	<p>Body</p>
+	{{ template "header" }}
 	{{ template "footer" }}
 </body>
 </html>
