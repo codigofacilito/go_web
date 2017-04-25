@@ -1,11 +1,9 @@
 package models
 
-// import "errors"
-
 type User struct{
-	Id			  int64		`json:"id"`
-	Username 	string	`json:"username"`
-	Password 	string	`json:"password"`
+  Id        int64   `json:"id"`
+  Username  string  `json:"username"`
+  Password  string  `json:"password"`
   Email     string  `json:"email"`
 }
 
@@ -17,7 +15,6 @@ const userSchema string = `CREATE TABLE users(
         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
 
 type Users []User
-
 
 func NewUser(username, password, email string) *User{
   user := &User{Username: username, Password: password, Email: email}
@@ -78,18 +75,3 @@ func (this *User) Delete(){
   sql := "DELETE FROM users WHERE id=?"
   Exec(sql, this.Id)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

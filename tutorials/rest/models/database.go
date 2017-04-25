@@ -68,4 +68,3 @@ func Ping(){
 func CloseConnection(){
   db.Close()
 }
-
