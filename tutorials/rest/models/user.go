@@ -21,10 +21,10 @@ func NewUser(username, password, email string) *User{
   return user
 }
 
-func CreateUser(username, password, email string) *User{
+func CreateUser(username, password, email string) (*User, error){
   user := NewUser(username, password, email)
-  user.Save()
-  return user
+  err := user.Save()
+  return user, err
 }
 
 func GetUser(id int) *User{
@@ -52,23 +52,25 @@ func GetUsers() Users {
   return users
 }
 
-func (this *User) Save(){
+func (this *User) Save() error {
   if this.Id == 0{
-    this.insert()
+    return this.insert()
   }else{
-    this.update()
+    return this.update()
   }
 }
 
-func (this *User) insert(){
+func (this *User) insert() error {
   sql := "INSERT users SET username=?, password=?, email=?"
-  result, _ := Exec(sql, this.Username, this.Password, this.Email)
-  this.Id, _ = result.LastInsertId() //int64
+  result, err := Exec(sql, this.Username, this.Password, this.Email)
+  this.Id, err = result.LastInsertId() //int64
+  return err
 }
 
-func (this *User) update(){
+func (this *User) update() error {
   sql := "UPDATE users SET username=?, password=?, email=?"
-  Exec(sql, this.Username, this.Password, this.Email )
+  _, err := Exec(sql, this.Username, this.Password, this.Email )
+  return err
 }
 
 func (this *User) Delete(){

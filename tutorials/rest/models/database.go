@@ -10,6 +10,11 @@ import(
 )
 var db *sql.DB
 
+func init(){
+  CreateConnection()
+  CreateTables()
+}
+
 func CreateConnection(){
   url := config.GetUrlDatabase()
   if connection, err := sql.Open("mysql", url ); err != nil{
@@ -58,6 +63,9 @@ func Query(query string, args ...interface{}) (*sql.Rows, error) {
   return rows, err
 }
 
+func GetConnection() *sql.DB {
+  return db
+}
 
 func Ping(){
   if err := db.Ping(); err != nil{
