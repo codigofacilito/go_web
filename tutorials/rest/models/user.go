@@ -9,7 +9,7 @@ type User struct{
 
 const userSchema string = `CREATE TABLE users(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(30) NOT NULL, 
+        username VARCHAR(30) NOT NULL UNIQUE, 
         password VARCHAR(64) NOT NULL,
         email VARCHAR(40),
         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
@@ -62,8 +62,8 @@ func (this *User) Save() error {
 
 func (this *User) insert() error {
   sql := "INSERT users SET username=?, password=?, email=?"
-  result, err := Exec(sql, this.Username, this.Password, this.Email)
-  this.Id, err = result.LastInsertId() //int64
+  id, err := InsertData(sql, this.Username, this.Password, this.Email)
+  this.Id = id
   return err
 }
 
@@ -73,7 +73,8 @@ func (this *User) update() error {
   return err
 }
 
-func (this *User) Delete(){
+func (this *User) Delete() error {
   sql := "DELETE FROM users WHERE id=?"
-  Exec(sql, this.Id)
+  _, err := Exec(sql, this.Id)
+  return err
 }

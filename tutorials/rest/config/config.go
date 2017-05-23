@@ -9,6 +9,7 @@ type DatabaseConfig struct{
   Host string
   Port int
   Database string
+  Debug bool
 }
 
 var database *DatabaseConfig
@@ -20,6 +21,11 @@ func init(){
   database.Host = gonv.GetStringEnv("HOST", "localhost")
   database.Port = gonv.GetIntEnv("PORT", 3306)
   database.Database = gonv.GetStringEnv("DATABASE", "project_go_web")
+  database.Debug = gonv.GetBoolEnv("DEBUG", true)
+}
+
+func GetDebug() bool{
+  return database.Debug
 }
 
 func GetUrlDatabase() string {
