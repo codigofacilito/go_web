@@ -37,21 +37,19 @@ func CreateUser(username, password, email string) (*User, error){
   return user, err
 }
 
-func GetUser(id int) *User{
-  user := NewUser("", "", "")
+func GetUserById(id int) *User{
   sql := "SELECT id, username, password, email, created_date FROM users WHERE id=?"
-  rows, _ := Query(sql, id)
-
-  for rows.Next(){
-    rows.Scan(&user.Id, &user.Username, &user.Password, &user.Email, &user.createdDate)
-  }
-  return user
+  return GetUser(sql, id)
 }
 
 func GetUserByUsername(username string) *User{
-  user := NewUser("", "", "")
   sql := "SELECT id, username, password, email, created_date FROM users WHERE username=?"
-  rows, _ := Query(sql, username)
+  return GetUser(sql, username)
+}
+
+func GetUser(sql string, arg interface{}) *User{
+  user := &User{}
+  rows, _ := Query(sql, arg)
 
   for rows.Next(){
     rows.Scan(&user.Id, &user.Username, &user.Password, &user.Email, &user.createdDate)

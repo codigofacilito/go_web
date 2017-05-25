@@ -86,7 +86,7 @@ func TestDuplicateUsername(t *testing.T){
 }
 
 func TestGetUser(t *testing.T){
-  user := models.GetUser(id)
+  user := models.GetUserById(id)
   if !equalsUser(user) || !equalsCreatedDate(user.GetCreatedDate()) {
     t.Error("No es posible obtener el usuario")
   }
