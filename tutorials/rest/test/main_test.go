@@ -22,7 +22,7 @@ func beforeTest(){
 }
 
 func createDefaultUser(){
-  sql := fmt.Sprintf("INSERT users SET id='%d', username='%s', password='%s', email='%s' ", id, username, password, email)
+  sql := fmt.Sprintf("INSERT users SET id='%d', username='%s', password='%s', email='%s', created_date='%s' ", id, username, passwordHash, email, createdDate)
   _, err := models.Exec(sql)
   if err != nil{
     panic(err)

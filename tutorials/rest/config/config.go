@@ -32,15 +32,7 @@ func GetUrlDatabase() string {
   return database.url()
 }
 
-//&parseTime=true
 func (this *DatabaseConfig) url() string{
   return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true", this.Username, this.Password, this.Host, this.Port, this.Database)
 }
-
-
-
-
-
-
-
 

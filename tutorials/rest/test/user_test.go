@@ -2,6 +2,7 @@ package test
 
 import(
   "fmt"
+  "time"
   "testing"
   "math/rand"
   "../models"
@@ -12,13 +13,46 @@ const(
   id = 1
   username = "eduardo_gpg"
   password = "password"
+  passwordHash = "$2a$10$vm0Ua5kMfSc2HqwjDN6m7eiXgB7zu0K6CTrW45SLxKI0ZCq44aQ3K"
   email = "eduardo@codigofacilito.com"
+  createdDate = "2017-08-17"
 )
 
 func TestNewUser(t *testing.T){
   user := models.NewUser(username, password, email)
   if !equalsUser(user){
     t.Error("No es posible crear el objeto")
+  }
+}
+
+func TestPassword(t *testing.T){
+  user := models.NewUser(username, password, email)
+  if user.Password == password || len(user.Password) != 60{
+    t.Error("No es posible cifrar el password")
+  }
+}
+
+func TestValidEmail(t *testing.T){
+  if valid := models.ValidEmail(email); !valid{
+    t.Error("Validación errónea en el email")
+  }
+}
+
+func TestInValidEmail(t *testing.T){
+  if valid := models.ValidEmail("asldlakjsdlkajsdlkasd.com"); valid{
+    t.Error("Validación errónea en el email")
+  }
+}
+
+func TestLogin(t *testing.T){
+  if valid := models.Login(username, password); !valid{
+    t.Error("No es posible realizar el login")
+  }
+}
+
+func TestNoLogin(t *testing.T){
+  if valid := models.Login(randomUsername(), password); valid{
+    t.Error("Es posible realizar un login con parametros erróneos")
   }
 }
 
@@ -53,7 +87,7 @@ func TestDuplicateUsername(t *testing.T){
 
 func TestGetUser(t *testing.T){
   user := models.GetUser(id)
-  if !equalsUser(user){
+  if !equalsUser(user) || !equalsCreatedDate(user.GetCreatedDate()) {
     t.Error("No es posible obtener el usuario")
   }
 }
@@ -65,14 +99,21 @@ func TestGetUsers(t *testing.T){
   }
 }
 
+/*
 func TestDeleteUser(t *testing.T){
   if err := user.Delete(); err != nil{
     t.Error("No es posible eliminar al usuario")
   }
 }
+*/
+
+func equalsCreatedDate(date time.Time) bool{
+  t, _ := time.Parse("2006-01-02",createdDate)
+  return t == date
+}
 
 func equalsUser(user *models.User) bool{
-  return user.Username == username && user.Password == password && user.Email == email
+  return user.Username == username && user.Email == email
 }
 
 func randomUsername() string{
