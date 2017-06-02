@@ -19,28 +19,40 @@ const(
 )
 
 func TestNewUser(t *testing.T){
-  user := models.NewUser(username, password, email)
-  if !equalsUser(user){
-    t.Error("No es posible crear el objeto")
+  _, err := models.NewUser(username, password, email)
+  if err != nil{
+    t.Error("No es posible crear el objeto", err)
   }
 }
 
 func TestPassword(t *testing.T){
-  user := models.NewUser(username, password, email)
+  user, _ := models.NewUser(username, password, email)
   if user.Password == password || len(user.Password) != 60{
     t.Error("No es posible cifrar el password")
   }
 }
 
 func TestValidEmail(t *testing.T){
-  if valid := models.ValidEmail(email); !valid{
-    t.Error("Validación errónea en el email")
+  if err := models.ValidEmail(email); err != nil{
+    t.Error("Validación errónea en el email", err)
   }
 }
 
 func TestInValidEmail(t *testing.T){
-  if valid := models.ValidEmail("asldlakjsdlkajsdlkasd.com"); valid{
+  if err := models.ValidEmail("asldlakjsdlkajsdlkasd.com"); err == nil{
     t.Error("Validación errónea en el email")
+  }
+}
+
+func TestUsernameLenght(t *testing.T){
+  newUsername := username
+  for i:=0; i<10; i++{
+    newUsername += newUsername
+  }
+
+  _, err := models.NewUser(newUsername, password, email)
+  if err == nil || err.Error() != "username muy largo, máximo 30 caracteres"{
+    t.Error("Es posible generar un usuario con un username muy grande")
   }
 }
 
@@ -57,7 +69,7 @@ func TestNoLogin(t *testing.T){
 }
 
 func TestSave(t *testing.T){
-  user := models.NewUser(randomUsername(), password, email)
+  user, _ := models.NewUser(randomUsername(), password, email)
   if err := user.Save(); err != nil{
     t.Error("No es posible crear el usuario", err)
   }

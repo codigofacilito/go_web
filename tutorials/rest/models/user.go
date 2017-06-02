@@ -3,6 +3,7 @@ package models
 import (
   "time"
   "regexp"
+  "errors"
   "golang.org/x/crypto/bcrypt"
 )
 
@@ -19,27 +20,31 @@ var emailRegexp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0
 const userSchema string = `CREATE TABLE users(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(30) NOT NULL UNIQUE, 
-        password VARCHAR(64) NOT NULL,
+        password VARCHAR(60) NOT NULL,
         email VARCHAR(40),
         created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
 
 type Users []User
 
-func NewUser(username, password, email string) *User{
+func NewUser(username, password, email string) (*User, error){
   user := &User{Username: username, Email: email}
-  user.SetPassword(password)
-  return user
-}
+  
+  if err := user.Valid(); err != nil{
+    return &User{}, err
+  }
 
-func CreateUser(username, password, email string) (*User, error){
-  user := NewUser(username, password, email)
-  err := user.Save()
+  err := user.SetPassword(password)
   return user, err
 }
 
-func GetUserById(id int) *User{
-  sql := "SELECT id, username, password, email, created_date FROM users WHERE id=?"
-  return GetUser(sql, id)
+func CreateUser(username, password, email string) (*User, error){
+  user, err:= NewUser(username, password, email)
+  if err != nil{
+    return &User{}, err
+  }
+
+  err = user.Save()
+  return user, err
 }
 
 func GetUserByUsername(username string) *User{
@@ -47,9 +52,17 @@ func GetUserByUsername(username string) *User{
   return GetUser(sql, username)
 }
 
-func GetUser(sql string, arg interface{}) *User{
+func GetUserById(id int) *User{
+  sql := "SELECT id, username, password, email, created_date FROM users WHERE id=?"
+  return GetUser(sql, id)
+}
+
+func GetUser(sql string, conditional interface{}) *User{
   user := &User{}
-  rows, _ := Query(sql, arg)
+  rows, err := Query(sql, conditional)
+  if err != nil{
+    return user
+  }
 
   for rows.Next(){
     rows.Scan(&user.Id, &user.Username, &user.Password, &user.Email, &user.createdDate)
@@ -77,8 +90,30 @@ func Login(username, password string) bool{
   return err == nil
 }
 
-func ValidEmail(email string) bool{
-  return emailRegexp.MatchString(email)
+func ValidEmail(email string) error{
+  if !emailRegexp.MatchString(email){
+    return errors.New("Formato de Email invalido")
+  }
+  return nil
+}
+
+func ValidUsername(username string) error{
+  if len(username) > 30{
+    return errors.New("username muy largo, máximo 30 caracteres")
+  }
+  return nil
+}
+
+func (this *User) Valid() error{
+  if err := ValidEmail(this.Email); err != nil{
+    return err
+  }
+
+  if err := ValidUsername(this.Username); err != nil{
+    return err
+  }
+
+  return nil
 }
 
 func (this *User) Save() error {
@@ -108,11 +143,15 @@ func (this *User) Delete() error {
   return err
 }
 
-func (this *User) SetPassword(password string){
-  hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func (this *User) SetPassword(password string) error{
+  hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+  if err != nil{
+    return errors.New("No es cifrar el password")
+  }
   this.Password = string(hash)
+  return nil
 }
-
+  
 func (this *User) GetCreatedDate() time.Time{
   return this.createdDate
 }
