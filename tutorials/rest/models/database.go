@@ -13,16 +13,15 @@ var debug bool
 
 func init(){
   CreateConnection()
-  debug = config.GetDebug()
+  debug = config.Debug()
 }
 
 func CreateConnection(){
   if GetConnection() != nil{
     return
   }
-
-  url := config.GetUrlDatabase()
-  if connection, err := sql.Open("mysql", url ); err != nil{
+  
+  if connection, err := sql.Open("mysql", config.UrlDatabase() ); err != nil{
     panic(err)
   }else{
     db = connection

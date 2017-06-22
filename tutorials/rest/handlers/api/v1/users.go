@@ -1,11 +1,12 @@
-package handlers
+package v1
 
 import(
-	"net/http"
-	"encoding/json"
-	"../models"
-	"github.com/gorilla/mux"
 	"strconv"
+	"errors"
+	"net/http"
+	"../../../models"
+	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request){
@@ -21,33 +22,55 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request){
-	user := models.User{}
+	user := &models.User{}
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&user); err != nil{
 		models.SendUnprocessableEntity(w)
-	}else{
-		models.SendData(w, models.SaveUser(user))
+		return
+	}	
+
+	if err := user.Valid(); err != nil{
+		models.SendUnprocessableEntity(w)
+		return
 	}
+
+	user.SetPassword(user.Password)
+	if err := user.Save(); err != nil{
+		models.SendUnprocessableEntity(w)
+		return
+	}
+	models.SendData(w, user)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request){
 	user, err := getUserByRequest(r)
-	
 	if err != nil{
 		models.SendNotFound(w)
 		return
 	}
 
-	userResponse := models.User{}
+	request := &models.User{}
 	decoder := json.NewDecoder(r.Body)
 
-	if err := decoder.Decode(&userResponse); err != nil{
+	if err:= decoder.Decode(request); err != nil{
 		models.SendUnprocessableEntity(w)
 		return
 	}
 
-	user = models.UpdateUser(user, userResponse.Username, userResponse.Password)
+	if err := user.Valid(); err != nil{
+		models.SendUnprocessableEntity(w)
+		return
+	}
+
+	user.Username = request.Username
+	user.Email = request.Email
+	user.SetPassword(request.Password)
+
+	if err := user.Save(); err != nil{
+		models.SendUnprocessableEntity(w)
+		return
+	}
 	models.SendData(w, user)
 }
 
@@ -55,20 +78,20 @@ func DeleteUser(w http.ResponseWriter, r *http.Request){
 	if user, err := getUserByRequest(r); err != nil{
 		models.SendNotFound(w)
 	}else{
-		models.DeleteUser(user.Id)
+		user.Delete()
 		models.SendNoContent(w)
 	}
 }
 
-func getUserByRequest(r *http.Request) (models.User, error){
+func getUserByRequest(r *http.Request) (*models.User, error){
 	vars := mux.Vars(r)
 	userId, _ :=  strconv.Atoi( vars["id"] )
+	user := models.GetUserById(userId)
 
-	if user, err := models.GetUser(userId); err != nil{
-		return user, err
-	}else{
-		return user, nil
+	if user.Id == 0{
+		return user, errors.New("El usuario no existe en la base de datos.")
 	}
+	return user, nil
 }
 
 

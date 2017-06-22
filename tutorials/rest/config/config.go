@@ -3,36 +3,76 @@ package config
 import "github.com/eduardogpg/gonv"
 import "fmt"
 
+type Config interface{
+  url() string
+}
+
 type DatabaseConfig struct{
-  Username string
-  Password string
-  Host string
-  Port int
-  Database string
-  Debug bool
+  username string
+  password string
+  host string
+  port int
+  database string
+  debug bool
+}
+
+type ServerConfig struct{
+  host      string
+  port      int
+  debug     bool
 }
 
 var database *DatabaseConfig
+var server *ServerConfig
 
 func init(){
   database = &DatabaseConfig{}
-  database.Username = gonv.GetStringEnv("USERNAME", "root")
-  database.Password = gonv.GetStringEnv("PASSWORD", "")
-  database.Host = gonv.GetStringEnv("HOST", "localhost")
-  database.Port = gonv.GetIntEnv("PORT", 3306)
-  database.Database = gonv.GetStringEnv("DATABASE", "project_go_web")
-  database.Debug = gonv.GetBoolEnv("DEBUG", true)
+  database.username = gonv.GetStringEnv("USERNAME", "root")
+  database.password = gonv.GetStringEnv("PASSWORD", "")
+  database.host = gonv.GetStringEnv("HOST", "localhost")
+  database.port = gonv.GetIntEnv("PORT", 3306)
+  database.database = gonv.GetStringEnv("DATABASE", "project_go_web")
+  database.debug = gonv.GetBoolEnv("DEBUG", true)
+
+  server = &ServerConfig{}
+  server.host = gonv.GetStringEnv("HOST", "localhost")
+  server.port = gonv.GetIntEnv("PORT", 3000)
+  server.debug = gonv.GetBoolEnv("DEBUG", true)
 }
 
-func GetDebug() bool{
-  return database.Debug
+func DirTemplate() string{
+  return "templates/**/*.html"
 }
 
-func GetUrlDatabase() string {
+func DirTemplateError() string{
+  return "templates/error.html"
+}
+
+func Debug() bool{
+  return server.debug
+}
+
+func UrlDatabase() string {
   return database.url()
 }
 
-func (this *DatabaseConfig) url() string{
-  return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true", this.Username, this.Password, this.Host, this.Port, this.Database)
+func UrlServer() string{
+  return server.url()
 }
+
+func ServerPort() int{
+  return server.port
+}
+
+func (this *DatabaseConfig) url() string{
+  return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true", this.username, this.password, this.host, this.port, this.database)
+}
+
+func (this *ServerConfig) url() string{
+  return fmt.Sprintf("%s:%d", this.host, this.port)
+}
+
+
+
+
 
