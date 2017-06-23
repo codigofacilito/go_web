@@ -12,4 +12,6 @@ var(
   errorEmail = ValidationError(errors.New("Formato invalido de Email."))
 
   errorPasswordEncryption = ValidationError(errors.New("No es posible cifrar el texto."))
+
+  errorLogin = ValidationError(errors.New("Usuario o password incorrectos."))
 )

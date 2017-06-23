@@ -1,0 +1,1 @@
+console.log("Gracias todos por tomar este curso!")
