@@ -45,7 +45,12 @@ func GetUser(r *http.Request) *models.User{
   return &models.User{}
 }
 
-func DeleteSession(w http.ResponseWriter){
+func DeleteSession(w http.ResponseWriter, r *http.Request){
+  Sessions.Lock()
+  defer Sessions.Unlock()
+
+  delete(Sessions.m, getValCookie(r))
+
   cookie := &http.Cookie{
     Name: cookieName,
     Value: "",

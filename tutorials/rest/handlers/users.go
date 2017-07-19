@@ -18,6 +18,9 @@ func NewUser(w http.ResponseWriter, r *http.Request){
     if _, err := models.CreateUser(username, password, email); err != nil{
       errorMessage := err.Error()
       context["Error"] = errorMessage
+    }else{
+      utils.SetSession(user, w)
+      http.Redirect(w, r, "/users/edit", http.StatusSeeOther)
     }
   }
   utils.RenderTemplate(w, "users/new", context)
@@ -34,14 +37,14 @@ func Login(w http.ResponseWriter, r *http.Request){
       context["Error"] = err.Error()
     }else{
       utils.SetSession(user, w)
-      fmt.Println("Estas autenticado.")
+      http.Redirect(w, r, "/users/edit", http.StatusSeeOther)
     }
   }
   utils.RenderTemplate(w, "users/login", context)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request){
-  utils.DeleteSession(w)
+  utils.DeleteSession(w, r)
   http.Redirect(w,r, "/users/login", http.StatusSeeOther)
 }
 
