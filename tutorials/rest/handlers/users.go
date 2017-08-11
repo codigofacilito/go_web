@@ -1,7 +1,6 @@
 package handlers
 
 import (
-  "fmt"
   "../utils"
   "net/http"
   "../models"
@@ -15,7 +14,7 @@ func NewUser(w http.ResponseWriter, r *http.Request){
     email := r.FormValue("email")
     password := r.FormValue("password")
 
-    if _, err := models.CreateUser(username, password, email); err != nil{
+    if user, err := models.CreateUser(username, password, email); err != nil{
       errorMessage := err.Error()
       context["Error"] = errorMessage
     }else{
